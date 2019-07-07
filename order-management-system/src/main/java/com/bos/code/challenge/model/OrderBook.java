@@ -8,10 +8,13 @@ import java.util.List;
  */
 public class OrderBook {
 
+    private String instrumentId;
     private String name;
     private OrderBookType orderBookType;
     private OrderBookStatus orderBookStatus;
     private List<Order> orders = new ArrayList<>();
+    private List<Execution> executions = new ArrayList<>();
+
 
     public String getName() {
         return name;
@@ -45,13 +48,31 @@ public class OrderBook {
         this.orders = orders;
     }
 
+    public String getInstrumentId() {
+        return instrumentId;
+    }
+
+    public void setInstrumentId(String instrumentId) {
+        this.instrumentId = instrumentId;
+    }
+
+    public List<Execution> getExecutions() {
+        return executions;
+    }
+
+    public void setExecutions(List<Execution> executions) {
+        this.executions = executions;
+    }
+
     @Override
     public String toString() {
         return "OrderBook{" +
-                "name='" + name + '\'' +
+                "instrumentId='" + instrumentId + '\'' +
+                ", name='" + name + '\'' +
                 ", orderBookType=" + orderBookType +
                 ", orderBookStatus=" + orderBookStatus +
                 ", orders=" + orders +
+                ", executions=" + executions +
                 '}';
     }
 }
