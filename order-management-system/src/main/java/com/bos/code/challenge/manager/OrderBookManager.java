@@ -17,7 +17,7 @@ public class OrderBookManager {
     private Map<String, OrderBook> INSTRUMENT_ID_ORDER_BOOK_MAP = new HashMap<String, OrderBook>();
 
     public ResponseCodes addOrder(final Order order) {
-        final OrderBook orderBook = getOrderBook(order.getInstrumentId());
+        final OrderBook orderBook = getOrderBook(order.getInstrumentId(), false);
         final ResponseCodes responseCodes;
         if (orderBook.getOrderBookStatus().equals(OrderBookStatus.OPEN)) {
             orderBook.getOrders().add(order);
@@ -31,27 +31,35 @@ public class OrderBookManager {
     }
 
     public ResponseCodes addExecution(final String instrumentId, final BigDecimal executionQuantity, final BigDecimal price) {
-        final OrderBook orderBook = getOrderBook(instrumentId);
-        BigDecimal residualQuantity = executionQuantity;
-        if(executionQuantity.compareTo(BigDecimal.ZERO) > 0){
-            residualQuantity = executeMarketOrders(price, orderBook, residualQuantity);
+        final OrderBook orderBook = getOrderBook(instrumentId, true);
+        final ResponseCodes responseCodes;
+        if(orderBook !=null && orderBook.getOrderBookStatus().equals(OrderBookStatus.CLOSE) && orderBook.getOrders().stream().filter(order -> !order.getOrderStatus().equals(OrderStatus.ORDER_FILLED)).collect(Collectors.toList()).size() > 0) {
+        	BigDecimal residualQuantity = executionQuantity;
+            if(executionQuantity.compareTo(BigDecimal.ZERO) > 0){
+                residualQuantity = executeMarketOrders(price, orderBook, residualQuantity);
+            }
+            if(residualQuantity.compareTo(BigDecimal.ZERO) >  0){
+                executeLimitOrders(price, orderBook, residualQuantity);
+            }
+            responseCodes = ResponseCodes.EXECUTION_SUCCESSFULL;
+        }else {
+        	responseCodes = ResponseCodes.EXECUTION_UNSUCCESSFULL;
         }
-        if(residualQuantity.compareTo(BigDecimal.ZERO) >  0){
-            executeLimitOrders(price, orderBook, residualQuantity);
-        }
-        return ResponseCodes.EXECUTION_SUCCESSFULL;
+        return responseCodes;
     }
 
-    private OrderBook getOrderBook(final String instrumentId) {
-        final OrderBook orderBook = INSTRUMENT_ID_ORDER_BOOK_MAP.getOrDefault(instrumentId, new OrderBook());
-        if (orderBook.getOrderBookStatus() == null) {
-            orderBook.setOrderBookStatus(OrderBookStatus.OPEN);
+    private OrderBook getOrderBook(final String instrumentId, final boolean isExecution) {
+        OrderBook orderBook = INSTRUMENT_ID_ORDER_BOOK_MAP.get(instrumentId);
+        if(orderBook == null && !isExecution) {
+        	orderBook = new OrderBook();
+        	orderBook.setOrderBookStatus(OrderBookStatus.OPEN);
+        	INSTRUMENT_ID_ORDER_BOOK_MAP.put(instrumentId, orderBook);
         }
         return orderBook;
     }
 
     private void updateOrderBookStatus(final OrderBook orderBook) {
-        if (orderBook.getOrders().size() > 10) {
+        if (orderBook.getOrders().size() >= 2) {
             orderBook.setOrderBookStatus(OrderBookStatus.CLOSE);
         }
     }
