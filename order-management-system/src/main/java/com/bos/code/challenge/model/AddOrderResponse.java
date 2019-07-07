@@ -1,10 +1,15 @@
 package com.bos.code.challenge.model;
 
 public class AddOrderResponse {
-	
+
 	private String description;
 	
 	private String code;
+
+	public AddOrderResponse(String description, String code) {
+		this.description = description;
+		this.code = code;
+	}
 
 	public String getDescription() {
 		return description;
