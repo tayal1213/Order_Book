@@ -17,7 +17,7 @@ public class HomeController {
 
     @RequestMapping("*")
     public String error(){
-        return "An error occurred, please contact TECH SUPPORT at techsupport@techsupport.com";
+        return "An error occurred, please contact TECH SUPPORT at techsupport@bos.com.sg";
     }
 
 
