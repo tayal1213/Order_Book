@@ -74,7 +74,7 @@ public class OrderBookManager {
                 final BigDecimal limitOrderQuantity = limitOrder.getQuantity();
                 final BigDecimal execQuantity;
 
-                if (residualQuantity.compareTo(BigDecimal.ZERO) > 0 && limitPrice.compareTo(price) >= 0) {
+                if (residualQuantity.compareTo(BigDecimal.ZERO) > 0 && limitPrice.compareTo(price) >= 0 && !limitOrder.getOrderStatus().equals(OrderStatus.ORDER_FILLED)) {
                     if (limitOrderQuantity.compareTo(residualQuantity) <= 0) {
                         limitOrder.setOrderStatus(OrderStatus.ORDER_FILLED);
                         residualQuantity = residualQuantity.subtract(limitOrderQuantity);
@@ -99,7 +99,7 @@ public class OrderBookManager {
         final List<Order> marketOrders = orderBook.getOrders().stream().filter(order -> order.getOrderType().equals(OrderType.MARKET_ORDER)).collect(Collectors.toList());
         if(!CollectionUtils.isEmpty(marketOrders)){
             for (final Order marketOrder : marketOrders) {
-                if (residualQuantity.compareTo(BigDecimal.ZERO) > 0) {
+                if (residualQuantity.compareTo(BigDecimal.ZERO) > 0 && !marketOrder.getOrderStatus().equals(OrderStatus.ORDER_FILLED)) {
 
                     final BigDecimal marketOrderQuantity = marketOrder.getQuantity();
                     final BigDecimal execQuantity;

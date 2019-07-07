@@ -31,6 +31,7 @@ public class OrderBookController {
 		order.setOrderId(request.getOrderType() + "-" + UUID.randomUUID().toString());
 		order.setQuantity(request.getQuantity());
 		order.setInstrumentId(request.getInstrumentId());
+		order.setOrderType(OrderType.valueOf(request.getOrderType()));
 		final ResponseCodes responseCode = orderBookManager.addOrder(order);
 		final AddOrderResponse addOrderResponse = responseCode != null ? new AddOrderResponse(responseCode.getDescription(), responseCode.getCode())
 																	   : new AddOrderResponse(CommonConstants.CODE, CommonConstants.DESCRIPTION);

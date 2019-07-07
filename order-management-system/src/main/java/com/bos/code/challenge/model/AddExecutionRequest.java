@@ -35,5 +35,12 @@ public class AddExecutionRequest {
         this.executionPrice = executionPrice;
     }
 
-
+    @Override
+    public String toString() {
+        return "AddExecutionRequest{" +
+                "instrumentId='" + instrumentId + '\'' +
+                ", executionQuantity=" + executionQuantity +
+                ", executionPrice=" + executionPrice +
+                '}';
+    }
 }
