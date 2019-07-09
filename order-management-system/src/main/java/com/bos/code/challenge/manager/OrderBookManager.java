@@ -1,6 +1,10 @@
 package com.bos.code.challenge.manager;
 
+import com.bos.code.challenge.controller.OrderBookController;
 import com.bos.code.challenge.model.*;
+
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
@@ -15,6 +19,8 @@ import java.util.stream.Collectors;
 public class OrderBookManager {
 
     private Map<String, OrderBook> INSTRUMENT_ID_ORDER_BOOK_MAP = new HashMap<String, OrderBook>();
+    
+    private static final Logger log = LogManager.getLogger(OrderBookManager.class.getName());
 
     public ResponseCodes addOrder(final Order order) {
         final OrderBook orderBook = getOrderBook(order.getInstrumentId(), false);
@@ -24,6 +30,7 @@ public class OrderBookManager {
             responseCodes = ResponseCodes.ORDER_ADDED;
             updateOrderBookStatus(orderBook);
         } else {
+        	log.info("Order book is closed for  :" +order.getInstrumentId());
             responseCodes = ResponseCodes.ORDER_BOOK_CLOSED;
         }
 
@@ -43,6 +50,7 @@ public class OrderBookManager {
             }
             responseCodes = ResponseCodes.EXECUTION_SUCCESSFULL;
         }else {
+        	log.info("All Order have filled");
         	responseCodes = ResponseCodes.EXECUTION_UNSUCCESSFULL;
         }
         return responseCodes;

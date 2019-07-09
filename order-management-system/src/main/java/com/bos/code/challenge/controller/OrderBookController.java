@@ -1,8 +1,11 @@
 package com.bos.code.challenge.controller;
 
-import com.bos.code.challenge.manager.OrderBookManager;
-import com.bos.code.challenge.model.*;
-import com.bos.code.challenge.util.CommonConstants;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.UUID;
+
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,9 +14,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.util.UUID;
+import com.bos.code.challenge.manager.OrderBookManager;
+import com.bos.code.challenge.model.AddExecutionRequest;
+import com.bos.code.challenge.model.AddExecutionResponse;
+import com.bos.code.challenge.model.AddOrderRequest;
+import com.bos.code.challenge.model.AddOrderResponse;
+import com.bos.code.challenge.model.Order;
+import com.bos.code.challenge.model.OrderType;
+import com.bos.code.challenge.model.ResponseCodes;
+import com.bos.code.challenge.util.CommonConstants;
 
 /**
  * Created by Atul on 6/7/19.
@@ -23,9 +32,13 @@ public class OrderBookController {
 
 	@Autowired
 	private OrderBookManager orderBookManager;
+	
+	private static final Logger log = LogManager.getLogger(OrderBookController.class.getName());
 
 	@RequestMapping(value = "/addOrder", method = RequestMethod.POST)
 	public ResponseEntity<AddOrderResponse> addOrder(final @RequestBody AddOrderRequest request) {
+		
+		log.info("Adding order for :" + request.getInstrumentId());
 		final Order order = new Order();
 		order.setEntryTime(ZonedDateTime.now(ZoneId.of("UTC")));
 		order.setOrderId(request.getOrderType() + "-" + UUID.randomUUID().toString());
@@ -43,6 +56,7 @@ public class OrderBookController {
 
 	@RequestMapping(value = "/addExecution", method = RequestMethod.POST)
 	public ResponseEntity<AddExecutionResponse> addExecution(final @RequestBody AddExecutionRequest executionRequest) {
+		log.info("Executing order for :" + executionRequest.getInstrumentId());
 		final ResponseCodes responseCodes = orderBookManager.addExecution(executionRequest.getInstrumentId(),
 				executionRequest.getExecutionQuantity(),
 				executionRequest.getExecutionPrice());
